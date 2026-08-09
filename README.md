@@ -4,7 +4,7 @@ CashScript payout contracts for PSFFPP (Permissionless Software Foundation File 
 
 Users send BCH to a single **PoolContract** address. Once per payout epoch (blockheight-gated), the pool splits 20% to treasury and 80% into three **ShareContract** UTXOs (one per node). A K-of-M (2-of-3) operator quorum must sign before any share pays out.
 
-Project docs live in [`docs/`](docs/). Start with [Why CashScript](docs/why-cashscript.md) for the high-level motivation (replacing PSF-token proof-of-burn with pure BCH payouts). External references: [CashScript](https://cashscript.org/) · Design: circular-economy trust-minimized federation (M=3, K=2).
+Project docs live in [`docs/`](docs/). Start with [Why CashScript](docs/why-cashscript.md) for the high-level motivation (replacing PSF-token proof-of-burn with pure BCH payouts). For indexer/pin-service/client integration (pool-address registry, dual-mode validation), see [Infra changes](docs/infra-changes.md). External references: [CashScript](https://cashscript.org/) · Design: circular-economy trust-minimized federation (M=3, K=2).
 
 ## Scope (v1)
 
