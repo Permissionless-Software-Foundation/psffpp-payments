@@ -1,0 +1,7 @@
+node_modules/
+deployments/
+*.log
+.DS_Store
+coverage/
+.nyc_output/
+config/deploy.mainnet.json

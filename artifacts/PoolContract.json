@@ -1,0 +1,228 @@
+{
+  "contractName": "PoolContract",
+  "constructorInputs": [
+    {
+      "name": "node0",
+      "type": "pubkey"
+    },
+    {
+      "name": "node1",
+      "type": "pubkey"
+    },
+    {
+      "name": "node2",
+      "type": "pubkey"
+    },
+    {
+      "name": "treasuryPkh",
+      "type": "bytes20"
+    },
+    {
+      "name": "share0",
+      "type": "bytes"
+    },
+    {
+      "name": "share1",
+      "type": "bytes"
+    },
+    {
+      "name": "share2",
+      "type": "bytes"
+    },
+    {
+      "name": "minConsolidation",
+      "type": "int"
+    },
+    {
+      "name": "splitBlockheight",
+      "type": "int"
+    }
+  ],
+  "abi": [
+    {
+      "name": "consolidate",
+      "inputs": []
+    },
+    {
+      "name": "split",
+      "inputs": []
+    },
+    {
+      "name": "migrate",
+      "inputs": [
+        {
+          "name": "s0",
+          "type": "sig"
+        },
+        {
+          "name": "s1",
+          "type": "sig"
+        },
+        {
+          "name": "s2",
+          "type": "sig"
+        }
+      ]
+    }
+  ],
+  "bytecode": "OP_9 OP_PICK OP_0 OP_NUMEQUAL OP_IF OP_TXOUTPUTCOUNT OP_2 OP_LESSTHANOREQUAL OP_VERIFY OP_TXOUTPUTCOUNT OP_1 OP_GREATERTHANOREQUAL OP_VERIFY OP_0 OP_0 OP_BEGIN OP_DUP OP_TXINPUTCOUNT OP_LESSTHAN OP_DUP OP_TOALTSTACK OP_IF OP_2DUP OP_UTXOVALUE OP_ADD OP_ROT OP_DROP OP_SWAP OP_DUP OP_1ADD OP_NIP OP_ENDIF OP_FROMALTSTACK OP_NOT OP_UNTIL OP_DROP OP_INPUTINDEX OP_UTXOBYTECODE OP_0 OP_0 OP_BEGIN OP_DUP OP_TXOUTPUTCOUNT OP_LESSTHAN OP_DUP OP_TOALTSTACK OP_IF OP_DUP OP_OUTPUTBYTECODE OP_3 OP_PICK OP_EQUALVERIFY OP_DUP OP_OUTPUTTOKENCATEGORY OP_0 OP_EQUALVERIFY OP_DUP OP_OUTPUTVALUE OP_12 OP_PICK OP_GREATERTHANOREQUAL OP_VERIFY OP_2DUP OP_OUTPUTVALUE OP_ADD OP_ROT OP_DROP OP_SWAP OP_DUP OP_1ADD OP_NIP OP_ENDIF OP_FROMALTSTACK OP_NOT OP_UNTIL OP_DROP OP_ROT OP_LESSTHANOREQUAL OP_VERIFY OP_2DROP OP_2DROP OP_2DROP OP_2DROP OP_2DROP OP_DROP OP_1 OP_ELSE OP_9 OP_PICK OP_1 OP_NUMEQUAL OP_IF OP_TXOUTPUTCOUNT OP_4 OP_NUMEQUALVERIFY OP_8 OP_ROLL OP_CHECKLOCKTIMEVERIFY OP_DROP OP_TXINPUTCOUNT OP_2 OP_LESSTHANOREQUAL OP_VERIFY OP_INPUTINDEX OP_UTXOVALUE OP_DUP 14 OP_MUL 64 OP_DIV OP_2DUP OP_SUB OP_DUP OP_3 OP_DIV OP_SWAP OP_OVER OP_3 OP_MUL OP_SUB OP_ROT OP_ADD OP_0 OP_OUTPUTBYTECODE 76a914 OP_8 OP_ROLL OP_CAT 88ac OP_CAT OP_EQUALVERIFY OP_0 OP_OUTPUTTOKENCATEGORY OP_0 OP_EQUALVERIFY OP_0 OP_OUTPUTVALUE OP_OVER OP_NUMEQUALVERIFY OP_1 OP_OUTPUTBYTECODE OP_7 OP_ROLL OP_EQUALVERIFY OP_1 OP_OUTPUTTOKENCATEGORY OP_0 OP_EQUALVERIFY OP_1 OP_OUTPUTVALUE OP_2 OP_PICK OP_NUMEQUALVERIFY OP_2 OP_OUTPUTBYTECODE OP_7 OP_ROLL OP_EQUALVERIFY OP_2 OP_OUTPUTTOKENCATEGORY OP_0 OP_EQUALVERIFY OP_2 OP_OUTPUTVALUE OP_2 OP_PICK OP_NUMEQUALVERIFY OP_3 OP_OUTPUTBYTECODE OP_7 OP_ROLL OP_EQUALVERIFY OP_3 OP_OUTPUTTOKENCATEGORY OP_0 OP_EQUALVERIFY OP_3 OP_OUTPUTVALUE OP_2 OP_PICK OP_NUMEQUALVERIFY OP_OVER OP_ADD OP_OVER OP_ADD OP_ADD OP_NUMEQUALVERIFY OP_2DROP OP_2DROP OP_DROP OP_1 OP_ELSE OP_9 OP_ROLL OP_2 OP_NUMEQUALVERIFY OP_TXOUTPUTCOUNT OP_2 OP_LESSTHANOREQUAL OP_VERIFY OP_TXOUTPUTCOUNT OP_1 OP_GREATERTHANOREQUAL OP_VERIFY OP_0 OP_10 OP_ROLL OP_ROT OP_CHECKSIG OP_IF OP_DUP OP_1ADD OP_NIP OP_ENDIF OP_9 OP_ROLL OP_ROT OP_CHECKSIG OP_IF OP_DUP OP_1ADD OP_NIP OP_ENDIF OP_8 OP_ROLL OP_ROT OP_CHECKSIG OP_IF OP_DUP OP_1ADD OP_NIP OP_ENDIF OP_2 OP_GREATERTHANOREQUAL OP_VERIFY OP_0 OP_0 OP_BEGIN OP_DUP OP_TXINPUTCOUNT OP_LESSTHAN OP_DUP OP_TOALTSTACK OP_IF OP_2DUP OP_UTXOVALUE OP_ADD OP_ROT OP_DROP OP_SWAP OP_DUP OP_1ADD OP_NIP OP_ENDIF OP_FROMALTSTACK OP_NOT OP_UNTIL OP_DROP OP_0 OP_0 OP_BEGIN OP_DUP OP_TXOUTPUTCOUNT OP_LESSTHAN OP_DUP OP_TOALTSTACK OP_IF OP_DUP OP_OUTPUTTOKENCATEGORY OP_0 OP_EQUALVERIFY OP_DUP OP_OUTPUTVALUE OP_0 OP_GREATERTHAN OP_VERIFY OP_2DUP OP_OUTPUTVALUE OP_ADD OP_ROT OP_DROP OP_SWAP OP_DUP OP_1ADD OP_NIP OP_ENDIF OP_FROMALTSTACK OP_NOT OP_UNTIL OP_DROP OP_GREATERTHANOREQUAL OP_VERIFY OP_2DROP OP_2DROP OP_2DROP OP_1 OP_ENDIF OP_ENDIF",
+  "source": "pragma cashscript ^0.13.0;\n\n////////////////////////////////////////////////////////////////////////////////\n// PoolContract — single pool instance per payout epoch (M=3, K=2)\n//\n// Holds user deposits. Each deploy is one height-gated payout epoch.\n// Next month: redeploy with a new splitBlockheight, then K-of-M migrate.\n//\n////////////////////////////////////////////////////////////////////////////////\n\ncontract PoolContract(\n    pubkey node0,\n    pubkey node1,\n    pubkey node2,\n    bytes20 treasuryPkh,\n    bytes share0,\n    bytes share1,\n    bytes share2,\n    int minConsolidation,\n    int splitBlockheight\n) {\n    //////////////////////////////////////////////////////////////////////////////\n    // Operation: consolidate (permissionless)\n    // inputs:\n    //   0..N  PoolContract             [BCH]  (one or more pool UTXOs)\n    //   ?     feePayer                 [BCH]  (optional)\n    // outputs:\n    //   0..1  PoolContract             [BCH]  (self-replicating, each >= minConsolidation)\n    //////////////////////////////////////////////////////////////////////////////\n    function consolidate() {\n        require(tx.outputs.length <= 2, \"consolidate: too many outputs\");\n        require(tx.outputs.length >= 1, \"consolidate: need at least 1 output\");\n\n        int inSum = 0;\n        for (int i = 0; i < tx.inputs.length; i = i + 1) {\n            inSum = inSum + tx.inputs[i].value;\n        }\n\n        // Compare against the P2SH locking bytecode on this input (not redeem script).\n        bytes contractLock = tx.inputs[this.activeInputIndex].lockingBytecode;\n\n        int outSum = 0;\n        for (int j = 0; j < tx.outputs.length; j = j + 1) {\n            require(\n                tx.outputs[j].lockingBytecode == contractLock,\n                \"consolidate: must self-replicate\"\n            );\n            require(tx.outputs[j].tokenCategory == 0x, \"consolidate: pure BCH only\");\n            require(\n                tx.outputs[j].value >= minConsolidation,\n                \"consolidate: output below minConsolidation\"\n            );\n            outSum = outSum + tx.outputs[j].value;\n        }\n\n        require(outSum <= inSum, \"consolidate: value not conserved\");\n    }\n\n    //////////////////////////////////////////////////////////////////////////////\n    // Operation: split (permissionless, blockheight-gated)\n    // inputs:\n    //   0   PoolContract               [BCH]  (consolidated pool UTXO — active input)\n    //   1?  feePayer                   [BCH]  (optional companion fee input)\n    // outputs:\n    //   0   treasury                   [BCH]  (20% + rounding remainder)\n    //   1   ShareContract node0        [BCH]  (equal share of 80%)\n    //   2   ShareContract node1        [BCH]\n    //   3   ShareContract node2        [BCH]\n    //////////////////////////////////////////////////////////////////////////////\n    function split() {\n        require(tx.outputs.length == 4, \"split: expected 4 outputs\");\n        require(tx.time >= splitBlockheight, \"split: blockheight gate not met\");\n\n        // Fee companion allowed; pool value taken from this active input only.\n        require(tx.inputs.length <= 2, \"split: at most 2 inputs\");\n\n        int poolValue = tx.inputs[this.activeInputIndex].value;\n        int treasuryBase = poolValue * 20 / 100;\n        int remaining = poolValue - treasuryBase;\n        int share = remaining / 3;\n        int remainder = remaining - share * 3;\n        int treasuryValue = treasuryBase + remainder;\n\n        // Output 0: treasury\n        require(\n            tx.outputs[0].lockingBytecode == new LockingBytecodeP2PKH(treasuryPkh),\n            \"split: output 0 must be treasury\"\n        );\n        require(tx.outputs[0].tokenCategory == 0x, \"split: treasury must be pure BCH\");\n        require(tx.outputs[0].value == treasuryValue, \"split: bad treasury value\");\n\n        // Outputs 1..3: equal shares locked in ShareContracts\n        require(tx.outputs[1].lockingBytecode == share0, \"split: output 1 must be share0\");\n        require(tx.outputs[1].tokenCategory == 0x, \"split: share0 must be pure BCH\");\n        require(tx.outputs[1].value == share, \"split: bad share0 value\");\n\n        require(tx.outputs[2].lockingBytecode == share1, \"split: output 2 must be share1\");\n        require(tx.outputs[2].tokenCategory == 0x, \"split: share1 must be pure BCH\");\n        require(tx.outputs[2].value == share, \"split: bad share1 value\");\n\n        require(tx.outputs[3].lockingBytecode == share2, \"split: output 3 must be share2\");\n        require(tx.outputs[3].tokenCategory == 0x, \"split: share2 must be pure BCH\");\n        require(tx.outputs[3].value == share, \"split: bad share2 value\");\n\n        // Exact poolValue apportionment (fee paid by companion input if present)\n        require(\n            treasuryValue + share + share + share == poolValue,\n            \"split: apportionment mismatch\"\n        );\n    }\n\n    //////////////////////////////////////////////////////////////////////////////\n    // Operation: migrate (K-of-M)\n    // inputs:\n    //   0..N  PoolContract             [BCH]\n    //   ?     feePayer                 [BCH]  (optional)\n    // outputs:\n    //   0..1  next-epoch destination   [BCH]  (authorized by signatures)\n    //////////////////////////////////////////////////////////////////////////////\n    function migrate(sig s0, sig s1, sig s2) {\n        require(tx.outputs.length <= 2, \"migrate: too many outputs\");\n        require(tx.outputs.length >= 1, \"migrate: need at least 1 output\");\n\n        int validCount = 0;\n        if (checkSig(s0, node0)) {\n            validCount = validCount + 1;\n        }\n        if (checkSig(s1, node1)) {\n            validCount = validCount + 1;\n        }\n        if (checkSig(s2, node2)) {\n            validCount = validCount + 1;\n        }\n        require(validCount >= 2, \"migrate: need at least 2-of-3 signatures\");\n\n        int inSum = 0;\n        for (int i = 0; i < tx.inputs.length; i = i + 1) {\n            inSum = inSum + tx.inputs[i].value;\n        }\n\n        int outSum = 0;\n        for (int j = 0; j < tx.outputs.length; j = j + 1) {\n            require(tx.outputs[j].tokenCategory == 0x, \"migrate: pure BCH only\");\n            require(tx.outputs[j].value > 0, \"migrate: zero output\");\n            outSum = outSum + tx.outputs[j].value;\n        }\n\n        require(outSum <= inSum, \"migrate: value not conserved\");\n    }\n}\n",
+  "fingerprint": "08188769a6af9aaba3fa5e3ce3c0c32f1e4525f06373e3b78a95551db9a66d9f",
+  "debug": {
+    "bytecode": "5979009c63c452a169c451a26900006576c39f766b636ec6937b757c768b77686c916675c0c700006576c49f766b6376cd53798876d1008876cc5c79a2696ecc937b757c768b77686c9166757ba1696d6d6d6d6d7551675979519c63c4549d587ab175c352a169c0c6760114950164966e947653967c785395947b9300cd0376a914587a7e0288ac7e8800d1008800cc789d51cd577a8851d1008851cc52799d52cd577a8852d1008852cc52799d53cd577a8853d1008853cc52799d78937893939d6d6d755167597a529dc452a169c451a269005a7a7bac63768b7768597a7bac63768b7768587a7bac63768b776852a26900006576c39f766b636ec6937b757c768b77686c91667500006576c49f766b6376d1008876cc00a0696ecc937b757c768b77686c916675a2696d6d6d516868",
+    "sourceMap": "30:4:57:5;;;;;31:16:31:33;:37::38;:16:::1;:8::73;32:16:32:33:0;:37::38;:16:::1;:8::79;34:20:34:21:0;35:21:35:22;:8:37:9;:24:35:25;:28::44;:24:::1;;;:57:37:9:0;36:20:36:39;:28::46:1;:20;:12::47;;;35:50:35:51:0;:::55:1;:46;:57:37:9;;:8;;;40:39:40:60:0;:29::77:1;42:21:42:22:0;43::43;:8:54:9;:24:43:25;:28::45;:24:::1;;;:58:54:9:0;45:27:45:28;:16::45:1;:49::61:0;;44:12:47:14:1;48:31:48:32:0;:20::47:1;:51::53:0;:12::85:1;50:27:50:28:0;:16::35:1;:39::55:0;;:16:::1;49:12:52:14;53:21:53:42:0;:30::49:1;:21;:12::50;;;43:51:43:52:0;:::56:1;:47;:58:54:9;;:8;;;56:26:56:31:0;:16:::1;:8::69;30:27:57:5;;;;;;;:4;70::110::0;;;;;71:16:71:33;:37::38;:8::69:1;72:27:72:43:0;;:8::80:1;;75:16:75:32:0;:36::37;:16:::1;:8::66;77:34:77:55:0;:24::62:1;78:27:78:36:0;:39::41;:27:::1;:44::47:0;:27:::1;79:24:79:48:0;::::1;80:20:80:29:0;:32::33;:20:::1;81:24:81::0;:36::41;:44::45;:36:::1;:24;82:28:82:40:0;:::52:1;86:23:86:24:0;:12::41:1;:45::82:0;:70::81;;:45::82:1;;;85:8:88:10;89:27:89:28:0;:16::43:1;:47::49:0;:8::87:1;90:27:90:28:0;:16::35:1;:39::52:0;:8::83:1;93:27:93:28:0;:16::45:1;:49::55:0;;:8::91:1;94:27:94:28:0;:16::43:1;:47::49:0;:8::85:1;95:27:95:28:0;:16::35:1;:39::44:0;;:8::73:1;97:27:97:28:0;:16::45:1;:49::55:0;;:8::91:1;98:27:98:28:0;:16::43:1;:47::49:0;:8::85:1;99:27:99:28:0;:16::35:1;:39::44:0;;:8::73:1;101:27:101:28:0;:16::45:1;:49::55:0;;:8::91:1;102:27:102:28:0;:16::43:1;:47::49:0;:8::85:1;103:27:103:28:0;:16::35:1;:39::44:0;;:8::73:1;107:28:107:33:0;:12:::1;:36::41:0;:12:::1;:::49;106:8:109:10;70:21:110:5;;;;:4;120::149::0;;;;121:16:121:33;:37::38;:16:::1;:8::69;122:16:122:33:0;:37::38;:16:::1;:8::75;124:25:124:26:0;125:21:125:23;;:25::30;:12::31:1;:33:127:9:0;126:25:126:35;:::39:1;:12::40;125:33:127:9;128:21:128:23:0;;:25::30;:12::31:1;:33:130:9:0;129:25:129:35;:::39:1;:12::40;128:33:130:9;131:21:131:23:0;;:25::30;:12::31:1;:33:133:9:0;132:25:132:35;:::39:1;:12::40;131:33:133:9;134:30:134:31:0;:16:::1;:8::77;136:20:136:21:0;137:21:137:22;:8:139:9;:24:137:25;:28::44;:24:::1;;;:57:139:9:0;138:20:138:39;:28::46:1;:20;:12::47;;;137:50:137:51:0;:::55:1;:46;:57:139:9;;:8;;;141:21:141:22:0;142::142;:8:146:9;:24:142:25;:28::45;:24:::1;;;:58:146:9:0;143:31:143:32;:20::47:1;:51::53:0;:12::81:1;144:31:144:32:0;:20::39:1;:42::43:0;:20:::1;:12::69;145:21:145:42:0;:30::49:1;:21;:12::50;;;142:51:142:52:0;:::56:1;:47;:58:146:9;;:8;;;148:16:148:31;:8::65;120:45:149:5;;;;11:0:150:1;",
+    "logs": [],
+    "requires": [
+      {
+        "ip": 17,
+        "line": 31,
+        "message": "consolidate: too many outputs"
+      },
+      {
+        "ip": 21,
+        "line": 32,
+        "message": "consolidate: need at least 1 output"
+      },
+      {
+        "ip": 60,
+        "line": 44,
+        "message": "consolidate: must self-replicate"
+      },
+      {
+        "ip": 64,
+        "line": 48,
+        "message": "consolidate: pure BCH only"
+      },
+      {
+        "ip": 70,
+        "line": 49,
+        "message": "consolidate: output below minConsolidation"
+      },
+      {
+        "ip": 87,
+        "line": 56,
+        "message": "consolidate: value not conserved"
+      },
+      {
+        "ip": 103,
+        "line": 71,
+        "message": "split: expected 4 outputs"
+      },
+      {
+        "ip": 106,
+        "line": 72,
+        "message": "split: blockheight gate not met"
+      },
+      {
+        "ip": 111,
+        "line": 75,
+        "message": "split: at most 2 inputs"
+      },
+      {
+        "ip": 139,
+        "line": 85,
+        "message": "split: output 0 must be treasury"
+      },
+      {
+        "ip": 143,
+        "line": 89,
+        "message": "split: treasury must be pure BCH"
+      },
+      {
+        "ip": 147,
+        "line": 90,
+        "message": "split: bad treasury value"
+      },
+      {
+        "ip": 152,
+        "line": 93,
+        "message": "split: output 1 must be share0"
+      },
+      {
+        "ip": 156,
+        "line": 94,
+        "message": "split: share0 must be pure BCH"
+      },
+      {
+        "ip": 161,
+        "line": 95,
+        "message": "split: bad share0 value"
+      },
+      {
+        "ip": 166,
+        "line": 97,
+        "message": "split: output 2 must be share1"
+      },
+      {
+        "ip": 170,
+        "line": 98,
+        "message": "split: share1 must be pure BCH"
+      },
+      {
+        "ip": 175,
+        "line": 99,
+        "message": "split: bad share1 value"
+      },
+      {
+        "ip": 180,
+        "line": 101,
+        "message": "split: output 3 must be share2"
+      },
+      {
+        "ip": 184,
+        "line": 102,
+        "message": "split: share2 must be pure BCH"
+      },
+      {
+        "ip": 189,
+        "line": 103,
+        "message": "split: bad share2 value"
+      },
+      {
+        "ip": 195,
+        "line": 106,
+        "message": "split: apportionment mismatch"
+      },
+      {
+        "ip": 208,
+        "line": 121,
+        "message": "migrate: too many outputs"
+      },
+      {
+        "ip": 212,
+        "line": 122,
+        "message": "migrate: need at least 1 output"
+      },
+      {
+        "ip": 243,
+        "line": 134,
+        "message": "migrate: need at least 2-of-3 signatures"
+      },
+      {
+        "ip": 279,
+        "line": 143,
+        "message": "migrate: pure BCH only"
+      },
+      {
+        "ip": 284,
+        "line": 144,
+        "message": "migrate: zero output"
+      },
+      {
+        "ip": 300,
+        "line": 148,
+        "message": "migrate: value not conserved"
+      }
+    ],
+    "sourceTags": "28:30:fu;31:34:lc;35:35:sc;68:70:fu;71:74:lc;75:75:sc;250:252:fu;253:256:lc;257:257:sc;282:284:fu;285:288:lc;289:289:sc"
+  },
+  "compiler": {
+    "name": "cashc",
+    "version": "0.13.2",
+    "options": {
+      "enforceFunctionParameterTypes": true,
+      "enforceLocktimeGuard": true
+    }
+  },
+  "updatedAt": "2026-08-09T16:19:40.583Z"
+}

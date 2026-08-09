@@ -1,0 +1,90 @@
+{
+  "contractName": "ShareContract",
+  "constructorInputs": [
+    {
+      "name": "node0",
+      "type": "pubkey"
+    },
+    {
+      "name": "node1",
+      "type": "pubkey"
+    },
+    {
+      "name": "node2",
+      "type": "pubkey"
+    },
+    {
+      "name": "nodePkh",
+      "type": "bytes20"
+    }
+  ],
+  "abi": [
+    {
+      "name": "claim",
+      "inputs": [
+        {
+          "name": "s0",
+          "type": "sig"
+        },
+        {
+          "name": "s1",
+          "type": "sig"
+        },
+        {
+          "name": "s2",
+          "type": "sig"
+        }
+      ]
+    }
+  ],
+  "bytecode": "OP_TXOUTPUTCOUNT OP_1 OP_NUMEQUALVERIFY OP_0 OP_5 OP_ROLL OP_ROT OP_CHECKSIG OP_IF OP_DUP OP_1ADD OP_NIP OP_ENDIF OP_4 OP_ROLL OP_ROT OP_CHECKSIG OP_IF OP_DUP OP_1ADD OP_NIP OP_ENDIF OP_3 OP_ROLL OP_ROT OP_CHECKSIG OP_IF OP_DUP OP_1ADD OP_NIP OP_ENDIF OP_2 OP_GREATERTHANOREQUAL OP_VERIFY OP_0 OP_OUTPUTBYTECODE 76a914 OP_ROT OP_CAT 88ac OP_CAT OP_EQUALVERIFY OP_0 OP_OUTPUTTOKENCATEGORY OP_0 OP_EQUALVERIFY OP_0 OP_0 OP_BEGIN OP_DUP OP_TXINPUTCOUNT OP_LESSTHAN OP_DUP OP_TOALTSTACK OP_IF OP_2DUP OP_UTXOVALUE OP_ADD OP_ROT OP_DROP OP_SWAP OP_DUP OP_1ADD OP_NIP OP_ENDIF OP_FROMALTSTACK OP_NOT OP_UNTIL OP_DROP OP_0 OP_OUTPUTVALUE OP_GREATERTHANOREQUAL OP_VERIFY OP_0 OP_OUTPUTVALUE OP_0 OP_GREATERTHAN",
+  "source": "pragma cashscript ^0.13.0;\n\n////////////////////////////////////////////////////////////////////////////////\n// ShareContract — one instance per node (M=3, K=2)\n//\n// Holds one node's monthly share UTXO until K-of-M operators approve claim.\n//\n// Operation: claim\n// inputs:\n//   0   ShareContract              [BCH]  (this share UTXO)\n//   1?  feePayer                   [BCH]  (optional P2PKH fee input)\n// outputs:\n//   0   nodePayout                 [BCH]  (P2PKH to this node's nodePkh)\n////////////////////////////////////////////////////////////////////////////////\n\ncontract ShareContract(\n    pubkey node0,\n    pubkey node1,\n    pubkey node2,\n    bytes20 nodePkh\n) {\n    function claim(sig s0, sig s1, sig s2) {\n        // CRITICAL: limit outputs first\n        require(tx.outputs.length == 1, \"claim: expected exactly 1 output\");\n\n        // K-of-M (K=2): empty sig (0x) returns false; never pass invalid non-empty sigs (NULLFAIL)\n        int validCount = 0;\n        if (checkSig(s0, node0)) {\n            validCount = validCount + 1;\n        }\n        if (checkSig(s1, node1)) {\n            validCount = validCount + 1;\n        }\n        if (checkSig(s2, node2)) {\n            validCount = validCount + 1;\n        }\n        require(validCount >= 2, \"claim: need at least 2-of-3 signatures\");\n\n        // Terminating spend to this node's payout address (no self-replication)\n        require(\n            tx.outputs[0].lockingBytecode == new LockingBytecodeP2PKH(nodePkh),\n            \"claim: output must pay nodePkh\"\n        );\n        require(tx.outputs[0].tokenCategory == 0x, \"claim: output must be pure BCH\");\n\n        // Value conservation (fee = inputs - output)\n        int inSum = 0;\n        for (int i = 0; i < tx.inputs.length; i = i + 1) {\n            inSum = inSum + tx.inputs[i].value;\n        }\n        require(tx.outputs[0].value <= inSum, \"claim: value not conserved\");\n        require(tx.outputs[0].value > 0, \"claim: zero payout\");\n    }\n}\n",
+  "fingerprint": "2937963007e829c882ed2cfd37948691c196d68c52c90a9d75f265a7b3b17a45",
+  "debug": {
+    "bytecode": "c4519d00557a7bac63768b7768547a7bac63768b7768537a7bac63768b776852a26900cd0376a9147b7e0288ac7e8800d1008800006576c39f766b636ec6937b757c768b77686c91667500cca26900cc00a0",
+    "sourceMap": "24:16:24:33;:37::38;:8::76:1;27:25:27:26:0;28:21:28:23;;:25::30;:12::31:1;:33:30:9:0;29:25:29:35;:::39:1;:12::40;28:33:30:9;31:21:31:23:0;;:25::30;:12::31:1;:33:33:9:0;32:25:32:35;:::39:1;:12::40;31:33:33:9;34:21:34:23:0;;:25::30;:12::31:1;:33:36:9:0;35:25:35:35;:::39:1;:12::40;34:33:36:9;37:30:37:31:0;:16:::1;:8::75;41:23:41:24:0;:12::41:1;:45::78:0;:70::77;:45::78:1;;;40:8:43:10;44:27:44:28:0;:16::43:1;:47::49:0;:8::85:1;47:20:47:21:0;48:21:48:22;:8:50:9;:24:48:25;:28::44;:24:::1;;;:57:50:9:0;49:20:49:39;:28::46:1;:20;:12::47;;;48:50:48:51:0;:::55:1;:46;:57:50:9;;:8;;;51:27:51:28:0;:16::35:1;:::44;:8::76;52:27:52:28:0;:16::35:1;:38::39:0;:8::63:1",
+    "logs": [],
+    "requires": [
+      {
+        "ip": 6,
+        "line": 24,
+        "message": "claim: expected exactly 1 output"
+      },
+      {
+        "ip": 37,
+        "line": 37,
+        "message": "claim: need at least 2-of-3 signatures"
+      },
+      {
+        "ip": 45,
+        "line": 40,
+        "message": "claim: output must pay nodePkh"
+      },
+      {
+        "ip": 49,
+        "line": 44,
+        "message": "claim: output must be pure BCH"
+      },
+      {
+        "ip": 76,
+        "line": 51,
+        "message": "claim: value not conserved"
+      },
+      {
+        "ip": 81,
+        "line": 52,
+        "message": "claim: zero payout"
+      }
+    ],
+    "sourceTags": "61:63:fu;64:67:lc;68:68:sc"
+  },
+  "compiler": {
+    "name": "cashc",
+    "version": "0.13.2",
+    "options": {
+      "enforceFunctionParameterTypes": true,
+      "enforceLocktimeGuard": true
+    }
+  },
+  "updatedAt": "2026-08-09T16:19:40.446Z"
+}

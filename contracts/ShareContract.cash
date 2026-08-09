@@ -1,0 +1,54 @@
+pragma cashscript ^0.13.0;
+
+////////////////////////////////////////////////////////////////////////////////
+// ShareContract — one instance per node (M=3, K=2)
+//
+// Holds one node's monthly share UTXO until K-of-M operators approve claim.
+//
+// Operation: claim
+// inputs:
+//   0   ShareContract              [BCH]  (this share UTXO)
+//   1?  feePayer                   [BCH]  (optional P2PKH fee input)
+// outputs:
+//   0   nodePayout                 [BCH]  (P2PKH to this node's nodePkh)
+////////////////////////////////////////////////////////////////////////////////
+
+contract ShareContract(
+    pubkey node0,
+    pubkey node1,
+    pubkey node2,
+    bytes20 nodePkh
+) {
+    function claim(sig s0, sig s1, sig s2) {
+        // CRITICAL: limit outputs first
+        require(tx.outputs.length == 1, "claim: expected exactly 1 output");
+
+        // K-of-M (K=2): empty sig (0x) returns false; never pass invalid non-empty sigs (NULLFAIL)
+        int validCount = 0;
+        if (checkSig(s0, node0)) {
+            validCount = validCount + 1;
+        }
+        if (checkSig(s1, node1)) {
+            validCount = validCount + 1;
+        }
+        if (checkSig(s2, node2)) {
+            validCount = validCount + 1;
+        }
+        require(validCount >= 2, "claim: need at least 2-of-3 signatures");
+
+        // Terminating spend to this node's payout address (no self-replication)
+        require(
+            tx.outputs[0].lockingBytecode == new LockingBytecodeP2PKH(nodePkh),
+            "claim: output must pay nodePkh"
+        );
+        require(tx.outputs[0].tokenCategory == 0x, "claim: output must be pure BCH");
+
+        // Value conservation (fee = inputs - output)
+        int inSum = 0;
+        for (int i = 0; i < tx.inputs.length; i = i + 1) {
+            inSum = inSum + tx.inputs[i].value;
+        }
+        require(tx.outputs[0].value <= inSum, "claim: value not conserved");
+        require(tx.outputs[0].value > 0, "claim: zero payout");
+    }
+}

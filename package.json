@@ -1,0 +1,34 @@
+{
+  "name": "psffpp-payments",
+  "version": "1.0.0",
+  "description": "CashScript payout contracts for PSFFPP circular-economy payments on Bitcoin Cash",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "compile": "node scripts/compile.mjs",
+    "addresses": "node scripts/addresses.mjs",
+    "deploy": "node scripts/deploy.mjs",
+    "test": "npm run compile && mocha --timeout 30000 'test/**/*.test.js'",
+    "test:unit": "npm test"
+  },
+  "keywords": [
+    "bitcoin-cash",
+    "cashscript",
+    "psffpp",
+    "smart-contracts"
+  ],
+  "author": "Permissionless Software Foundation",
+  "license": "MIT",
+  "dependencies": {
+    "@bitauth/libauth": "^3.0.0",
+    "cashc": "^0.13.2",
+    "cashscript": "^0.13.2"
+  },
+  "devDependencies": {
+    "c8": "^10.1.3",
+    "mocha": "^11.7.1"
+  },
+  "engines": {
+    "node": ">=22"
+  }
+}
