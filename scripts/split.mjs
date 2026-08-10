@@ -1,12 +1,15 @@
 #!/usr/bin/env node
 /**
  * Split one PoolContract UTXO into treasury (20%) + three ShareContracts (80%/3).
- * Permissionless after splitBlockheight. Miner fee comes from a companion P2PKH input
- * (this covenant requires the four outputs to sum to 100% of the pool UTXO, so the
- * fee cannot be taken from the pool without a contract change).
+ * Permissionless after splitBlockheight.
+ *
+ * Miner fee comes from a companion P2PKH input. The covenant requires exactly four
+ * outputs (no change), so a large wallet UTXO must never be spent as the fee input.
+ * This script estimates the split fee, then — if no suitably small UTXO exists —
+ * carves one with wallet.send() (self-send) before building the split.
  *
  * - CashScript ElectrumNetworkProvider: pool UTXOs (P2SH32-safe) + unlock + locktime
- * - minimal-slp-wallet: fee-payer UTXOs + broadcast (embedded bch-js at wallet.bchjs)
+ * - minimal-slp-wallet: carve fee UTXO + broadcast (embedded bch-js at wallet.bchjs)
  *
  * Usage:
  *   node scripts/split.mjs --wif <WIF> [config/deploy.mainnet.json] [--dry-run] [--fee-rate 1.2]
@@ -34,6 +37,13 @@ import {
 const DEFAULT_REST = 'https://free-bch.fullstack.cash'
 const DEFAULT_FEE_RATE = 1.2
 const SIGHASH = HashType.SIGHASH_ALL | HashType.SIGHASH_UTXOS
+
+/** Extra sats carved above fee estimate so size refine / min 1 sat/byte still fits. */
+const FEE_CARVE_BUFFER = 300n
+/** Reuse an existing UTXO only if tip (utxo - estimatedFee) stays within this. */
+const MAX_REUSE_TIP = 500n
+/** Wait after carve broadcast before re-fetching UTXOs. */
+const CARVE_CONFIRM_MS = 4000
 
 function parseArgs (argv) {
   const args = {
@@ -113,16 +123,108 @@ function toCashScriptUtxos (walletUtxoPayload) {
   })
 }
 
-function pickFeeUtxo (utxos, minFee) {
-  const sorted = [...utxos].sort((a, b) => Number(a.satoshis - b.satoshis))
-  const fit = sorted.find((u) => u.satoshis >= minFee)
-  if (!fit) {
-    const have = utxos.reduce((s, u) => s + u.satoshis, 0n)
+function feeFromHex (hex, feeRate) {
+  const bytes = hex.length / 2
+  const atRate = BigInt(Math.ceil(bytes * feeRate))
+  const minOne = BigInt(Math.ceil(bytes)) // CashScript enforces >= 1 sat/byte
+  return atRate > minOne ? atRate : minOne
+}
+
+function sleep (ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms))
+}
+
+/**
+ * Prefer the smallest existing UTXO that covers the fee without a large tip.
+ * Otherwise carve a dedicated self-send UTXO of size estimatedFee + buffer.
+ */
+async function ensureSmallFeeUtxo ({
+  wallet,
+  estimatedFee,
+  dryRun
+}) {
+  const targetCarve = estimatedFee + FEE_CARVE_BUFFER
+  const maxReuse = estimatedFee + MAX_REUSE_TIP
+
+  const load = async () => toCashScriptUtxos(await wallet.getUtxos())
+  let utxos = await load()
+  if (utxos.length === 0) {
+    throw new Error(`Fee wallet has no BCH UTXOs (${wallet.walletInfo.cashAddress})`)
+  }
+
+  const reusable = utxos
+    .filter((u) => u.satoshis >= estimatedFee && u.satoshis <= maxReuse)
+    .sort((a, b) => Number(a.satoshis - b.satoshis))
+
+  if (reusable.length > 0) {
+    return {
+      feeUtxo: reusable[0],
+      carved: false,
+      carveTxid: null,
+      carveAmount: null
+    }
+  }
+
+  if (dryRun) {
+    return {
+      feeUtxo: {
+        txid: '0'.repeat(64),
+        vout: 0,
+        satoshis: targetCarve,
+        placeholder: true
+      },
+      carved: 'would_carve',
+      carveTxid: null,
+      carveAmount: targetCarve
+    }
+  }
+
+  const amountSat = Number(targetCarve)
+  if (!Number.isSafeInteger(amountSat) || amountSat < 546) {
+    throw new Error(`Invalid carve amount: ${targetCarve}`)
+  }
+
+  console.error(JSON.stringify({
+    action: 'carve_fee_utxo',
+    to: wallet.walletInfo.cashAddress,
+    amountSat,
+    reason: `No fee UTXO in [${estimatedFee}, ${maxReuse}] sats; carving dedicated UTXO`
+  }))
+
+  const carveTxid = await wallet.send([{
+    address: wallet.walletInfo.cashAddress,
+    amountSat
+  }])
+
+  // Refresh UTXO set until the carved output appears (indexer lag).
+  let carved = null
+  for (let attempt = 0; attempt < 8; attempt++) {
+    await sleep(CARVE_CONFIRM_MS)
+    await wallet.initialize()
+    utxos = await load()
+    carved = utxos.find(
+      (u) => u.txid === carveTxid && u.satoshis === BigInt(amountSat)
+    )
+    if (carved) break
+  }
+
+  if (!carved) {
+    utxos = await load()
+    carved = utxos.find((u) => u.satoshis === BigInt(amountSat))
+  }
+
+  if (!carved) {
     throw new Error(
-      `Fee wallet has no UTXO >= estimated fee ${minFee} sats (total BCH UTXOs: ${have})`
+      `Carved fee UTXO not found after send (txid ${carveTxid}, amount ${amountSat}). Retry shortly.`
     )
   }
-  return fit
+
+  return {
+    feeUtxo: carved,
+    carved: true,
+    carveTxid,
+    carveAmount: targetCarve
+  }
 }
 
 async function createFeeWallet ({ wif, mnemonic, restURL }) {
@@ -153,7 +255,7 @@ async function main () {
     process.exit(1)
   }
 
-  let poolUtxos = (await pool.getUtxos()).filter((u) => !u.token)
+  const poolUtxos = (await pool.getUtxos()).filter((u) => !u.token)
   if (poolUtxos.length === 0) {
     console.error(JSON.stringify({
       ok: false,
@@ -179,9 +281,8 @@ async function main () {
   const treasuryAddr = pkhToCashAddr(cfg.treasuryPkh, network)
 
   const wallet = await createFeeWallet(args)
-  const feePayload = await wallet.getUtxos()
-  const feeUtxos = toCashScriptUtxos(feePayload)
-  if (feeUtxos.length === 0) {
+  const probeUtxos = toCashScriptUtxos(await wallet.getUtxos())
+  if (probeUtxos.length === 0) {
     console.error(JSON.stringify({
       ok: false,
       error: 'Fee wallet has no BCH UTXOs',
@@ -193,48 +294,60 @@ async function main () {
   const wif = wallet.walletInfo.privateKey
   const feeTmpl = new SignatureTemplate(wif, SIGHASH, SignatureAlgorithm.ECDSA)
 
-  // Rough fee estimate, then refine after picking a concrete fee UTXO.
-  // Covenant forbids a 5th change output: entire fee UTXO is consumed as miner fee.
-  let estimatedFee = 2000n
-  let feeUtxo = pickFeeUtxo(feeUtxos, estimatedFee)
+  const build = (feeIn) => new TransactionBuilder({ provider })
+    .addInput(poolUtxo, pool.unlock.split())
+    .addInput(feeIn, feeTmpl.unlockP2PKH())
+    .addOutput({ to: treasuryAddr, amount: treasuryValue })
+    .addOutput({ to: shares[0].address, amount: share })
+    .addOutput({ to: shares[1].address, amount: share })
+    .addOutput({ to: shares[2].address, amount: share })
+    .setLocktime(cfg.splitBlockheight)
 
-  const build = (feeIn) => {
-    return new TransactionBuilder({ provider })
-      .addInput(poolUtxo, pool.unlock.split())
-      .addInput(feeIn, feeTmpl.unlockP2PKH())
-      .addOutput({ to: treasuryAddr, amount: treasuryValue })
-      .addOutput({ to: shares[0].address, amount: share })
-      .addOutput({ to: shares[1].address, amount: share })
-      .addOutput({ to: shares[2].address, amount: share })
-      .setLocktime(cfg.splitBlockheight)
+  // Size estimate: P2PKH unlock size is independent of UTXO value — use any UTXO as probe.
+  const probeHex = build(probeUtxos[0]).build()
+  let estimatedFee = feeFromHex(probeHex, args.feeRate)
+
+  const ensured = await ensureSmallFeeUtxo({
+    wallet,
+    estimatedFee,
+    dryRun: args.dryRun
+  })
+  let feeUtxo = ensured.feeUtxo
+
+  let hex
+  if (feeUtxo.placeholder) {
+    // Dry-run with planned carve size — build still needs a real unlockable input for a valid hex;
+    // report plan without a spendable split hex when we would carve.
+    hex = null
+  } else {
+    hex = build(feeUtxo).build()
+    estimatedFee = feeFromHex(hex, args.feeRate)
+    if (feeUtxo.satoshis < estimatedFee) {
+      // Rare: carved buffer was insufficient — carve once more at the refined size.
+      const retry = await ensureSmallFeeUtxo({
+        wallet,
+        estimatedFee,
+        dryRun: args.dryRun
+      })
+      feeUtxo = retry.feeUtxo
+      if (feeUtxo.placeholder) {
+        hex = null
+      } else {
+        hex = build(feeUtxo).build()
+        estimatedFee = feeFromHex(hex, args.feeRate)
+        Object.assign(ensured, retry)
+      }
+    }
   }
 
-  let builder = build(feeUtxo)
-  let hex = builder.build()
-  estimatedFee = BigInt(Math.ceil((hex.length / 2) * args.feeRate))
-  // CashScript also enforces >= 1 sat/byte
-  if (estimatedFee < BigInt(Math.ceil(hex.length / 2))) {
-    estimatedFee = BigInt(Math.ceil(hex.length / 2))
-  }
-
-  if (feeUtxo.satoshis < estimatedFee) {
-    feeUtxo = pickFeeUtxo(feeUtxos, estimatedFee)
-    builder = build(feeUtxo)
-    hex = builder.build()
-    estimatedFee = BigInt(Math.ceil((hex.length / 2) * args.feeRate))
-  }
-
-  if (feeUtxo.satoshis < estimatedFee) {
+  if (feeUtxo.satoshis < estimatedFee && !feeUtxo.placeholder) {
     console.error(JSON.stringify({
       ok: false,
-      error: `Selected fee UTXO ${feeUtxo.satoshis} < required ~${estimatedFee}`,
+      error: `Fee UTXO ${feeUtxo.satoshis} < required ~${estimatedFee} after carve`,
       feeAddress: wallet.walletInfo.cashAddress
     }, null, 2))
     process.exit(1)
   }
-
-  // Actual miner fee = feeUtxo (no change allowed under 4-output covenant).
-  const minerFee = feeUtxo.satoshis
 
   const summary = {
     poolAddress: pool.address,
@@ -249,12 +362,16 @@ async function main () {
     feeUtxo: {
       txid: feeUtxo.txid,
       vout: feeUtxo.vout,
-      satoshis: feeUtxo.satoshis.toString()
+      satoshis: feeUtxo.satoshis.toString(),
+      placeholder: Boolean(feeUtxo.placeholder)
     },
-    minerFee: minerFee.toString(),
+    minerFee: feeUtxo.satoshis.toString(),
     estimatedFeeAtRate: estimatedFee.toString(),
     feeRate: args.feeRate,
-    note: 'Fee UTXO is fully consumed (no change output — covenant requires exactly 4 outputs). Excess over estimatedFee is an extra tip.',
+    carved: ensured.carved,
+    carveTxid: ensured.carveTxid,
+    carveAmount: ensured.carveAmount != null ? ensured.carveAmount.toString() : null,
+    note: 'Companion fee input has no change under the 4-output covenant. Large wallet UTXOs are never spent as the fee input; a small self-send UTXO is carved when needed.',
     dryRun: args.dryRun
   }
 

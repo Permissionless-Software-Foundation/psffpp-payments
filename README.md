@@ -90,7 +90,9 @@ npm run consolidate
 
 ### Split
 
-Permissionless after `splitBlockheight`. Apportions **100%** of one pool UTXO (20% treasury + 80%/3 shares). Miner fee must come from a **companion P2PKH** input (`--wif` / `--mnemonic`) — the covenant forbids taking the fee from the pool without a contract change, and there is no change output (exactly 4 outputs).
+Permissionless after `splitBlockheight`. Apportions **100%** of one pool UTXO (20% treasury + 80%/3 shares). Miner fee must come from a **companion P2PKH** input (`--wif` / `--mnemonic`) — the covenant forbids taking the fee from the pool or adding a 5th change output.
+
+The script never spends a large fee-wallet UTXO as the companion input. It reuses an existing UTXO only if it is within ~500 sats of the estimated fee; otherwise it first `wallet.send`s a small self-payment to carve a dedicated fee UTXO (two txs: carve + split).
 
 ```bash
 npm run consolidate          # if more than one pool UTXO
