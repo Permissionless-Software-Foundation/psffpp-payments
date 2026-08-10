@@ -101,6 +101,18 @@ npm run split -- --wif <WIF>
 # or: --mnemonic "twelve words ..."
 ```
 
+### Claim cosign
+
+`ShareContract.claim` needs **2-of-3 transaction ECDSA** signatures (not `signMessageWithPrivKey` message sigs). A cosigner runs:
+
+```bash
+npm run claim-cosign -- --wif <COSIGNER_WIF> --share-index 0 --out claim-sig.json
+# --share-index = which node's share is being claimed (0|1|2)
+# optional: --utxo <txid>:<vout> if that share has multiple UTXOs
+```
+
+This writes a JSON file (`type: psffpp-share-claim-sig`) the claimant can collect until they have ≥2 signatures for the same claim parameters, then assemble/broadcast.
+
 ### Signing (ECDSA)
 
 ```js

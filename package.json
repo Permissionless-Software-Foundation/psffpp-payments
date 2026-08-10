@@ -10,6 +10,7 @@
     "deploy": "node scripts/deploy.mjs",
     "consolidate": "node scripts/consolidate.mjs",
     "split": "node scripts/split.mjs",
+    "claim-cosign": "node scripts/claim-cosign.mjs",
     "test": "npm run compile && mocha --timeout 30000 'test/**/*.test.js'",
     "test:unit": "npm test"
   },
