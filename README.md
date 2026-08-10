@@ -71,12 +71,22 @@ Contracts are immutable. Order matters:
 5. Publish **Pool** P2SH32 address as the deposit address.
 6. **Smoke checklist** (small intentional funding only):
    - Deposit a small amount to the Pool
-   - Run `consolidate` if multiple UTXOs
+   - Run `npm run consolidate -- --dry-run` then `npm run consolidate` if multiple UTXOs (fee taken from pool; needs ≥2 UTXOs and output ≥ `minConsolidation`)
    - Confirm `split` fails before the gate
    - After height: `split` with a fee-paying companion input
    - `claim` a share with 2-of-3 ECDSA signatures
    - Optionally test `migrate` to a next-epoch Pool
 7. Only then accept production deposits
+
+### Consolidate
+
+Permissionless merge of PoolContract UTXOs (via [minimal-slp-wallet](https://www.npmjs.com/package/minimal-slp-wallet) for UTXOs/broadcast + CashScript unlock):
+
+```bash
+npm run consolidate -- --dry-run
+npm run consolidate
+# optional: --fee-rate 1.2 --max-utxos 50 --rest-url https://free-bch.fullstack.cash
+```
 
 ### Signing (ECDSA)
 
