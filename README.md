@@ -80,12 +80,23 @@ Contracts are immutable. Order matters:
 
 ### Consolidate
 
-Permissionless merge of PoolContract UTXOs (via [minimal-slp-wallet](https://www.npmjs.com/package/minimal-slp-wallet) for UTXOs/broadcast + CashScript unlock):
+Permissionless merge of PoolContract UTXOs (via [minimal-slp-wallet](https://www.npmjs.com/package/minimal-slp-wallet) for broadcast + CashScript unlock). Fee is taken from the pool:
 
 ```bash
 npm run consolidate -- --dry-run
 npm run consolidate
 # optional: --fee-rate 1.2 --max-utxos 50 --rest-url https://free-bch.fullstack.cash
+```
+
+### Split
+
+Permissionless after `splitBlockheight`. Apportions **100%** of one pool UTXO (20% treasury + 80%/3 shares). Miner fee must come from a **companion P2PKH** input (`--wif` / `--mnemonic`) — the covenant forbids taking the fee from the pool without a contract change, and there is no change output (exactly 4 outputs).
+
+```bash
+npm run consolidate          # if more than one pool UTXO
+npm run split -- --wif <WIF> --dry-run
+npm run split -- --wif <WIF>
+# or: --mnemonic "twelve words ..."
 ```
 
 ### Signing (ECDSA)

@@ -9,6 +9,7 @@
     "addresses": "node scripts/addresses.mjs",
     "deploy": "node scripts/deploy.mjs",
     "consolidate": "node scripts/consolidate.mjs",
+    "split": "node scripts/split.mjs",
     "test": "npm run compile && mocha --timeout 30000 'test/**/*.test.js'",
     "test:unit": "npm test"
   },
