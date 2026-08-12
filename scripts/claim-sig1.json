@@ -1,0 +1,39 @@
+{
+  "type": "psffpp-share-claim-sig",
+  "version": 1,
+  "network": "mainnet",
+  "claim": {
+    "shareIndex": 0,
+    "shareName": "node0",
+    "shareAddress": "bitcoincash:p0xu7h39z33ljatywsru6uge8e3x9xpkl939hjkm3d0psjd0gdw9u3xe00cld",
+    "shareUtxo": {
+      "txid": "db6820214a6459e33b684728a9caa18dcf7b554c6e09fcce436e69a3c98be681",
+      "vout": 1,
+      "satoshis": "28937"
+    },
+    "payoutAddress": "bitcoincash:qpc86qr9rcrys7q8274dsjaj5l6u50wfxcdclwtxc4",
+    "payoutSatoshis": "28495",
+    "feeSatoshis": "442",
+    "feeMode": "from_share",
+    "sighash": "ALL|UTXOS",
+    "signatureAlgorithm": "ECDSA",
+    "constructorPubkeys": [
+      "0364d5fea1f8550dc16c1169888afcdf85ee77bcc1cb7e902ecb1f03e5fdf58f06",
+      "02e7450eae4e52effc95cb3ddab97b162fa36ec20c0110c514a51ebe1a2e36ad51",
+      "028a67119eecba54522bbbac60992c7f94a5dcbe55702d168956e1d246d6e3a203"
+    ]
+  },
+  "signer": {
+    "nodeIndex": 0,
+    "name": "node0",
+    "pubkey": "0364d5fea1f8550dc16c1169888afcdf85ee77bcc1cb7e902ecb1f03e5fdf58f06",
+    "cashAddress": "bitcoincash:qpc86qr9rcrys7q8274dsjaj5l6u50wfxcdclwtxc4"
+  },
+  "signature": "3044022042eadb2e90efc19c281f10138779fbd908b99c88b54c6309fa5cb1d9c1cba90602204e875c40f584be52f4434ec8aa3e5f0c5fd93b062c3fbd6cdf9afc599249ac4961",
+  "notes": [
+    "This signature unlocks ShareContract.claim for the exact claim tx described above.",
+    "Do not change payoutSatoshis, fee, or UTXO without re-collecting signatures.",
+    "Unused claim slots must be empty bytes (0x), never invalid non-empty sigs.",
+    "BitcoinCash.signMessageWithPrivKey message signatures are NOT valid here."
+  ]
+}

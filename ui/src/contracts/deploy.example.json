@@ -1,0 +1,23 @@
+{
+  "network": "mainnet",
+  "minConsolidation": 100000,
+  "splitBlockheight": 920000,
+  "treasuryPkh": "0000000000000000000000000000000000000000",
+  "nodes": [
+    {
+      "name": "node0",
+      "pubkey": "02aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "pkh": "1111111111111111111111111111111111111111"
+    },
+    {
+      "name": "node1",
+      "pubkey": "02bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      "pkh": "2222222222222222222222222222222222222222"
+    },
+    {
+      "name": "node2",
+      "pubkey": "02cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+      "pkh": "3333333333333333333333333333333333333333"
+    }
+  ]
+}

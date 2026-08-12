@@ -4,15 +4,16 @@ CashScript payout contracts for PSFFPP (Permissionless Software Foundation File 
 
 Users send BCH to a single **PoolContract** address. Once per payout epoch (blockheight-gated), the pool splits 20% to treasury and 80% into three **ShareContract** UTXOs (one per node). A K-of-M (2-of-3) operator quorum must sign before any share pays out.
 
-Project docs live in [`docs/`](docs/). Start with [Why CashScript](docs/why-cashscript.md) for the high-level motivation (replacing PSF-token proof-of-burn with pure BCH payouts). For indexer/pin-service/client integration (pool-address registry, dual-mode validation), see [Infra changes](docs/infra-changes.md). External references: [CashScript](https://cashscript.org/) · Design: circular-economy trust-minimized federation (M=3, K=2).
+Project docs live in [`docs/`](docs/). Start with [Why CashScript](docs/why-cashscript.md) for the high-level motivation (replacing PSF-token proof-of-burn with pure BCH payouts). For indexer/pin-service/client integration (pool-address registry, dual-mode validation), see [Infra changes](docs/infra-changes.md). The operator React UI lives in [`ui/`](ui/) ([UI README](ui/README.md)); deferred UI features (migrate, registry announce, automation, etc.) are documented in [UI deferred](docs/ui-deferred.md). External references: [CashScript](https://cashscript.org/) · Design: circular-economy trust-minimized federation (M=3, K=2).
 
 ## Scope (v1)
 
 | In scope | Out of scope |
 |----------|--------------|
 | `ShareContract.cash`, `PoolContract.cash` | Cron (consolidate/split/broadcast) |
-| Compile + mock tests | Timecard web GUI / sig collection |
+| Compile + mock tests | Migrate / registry announce UI ([deferred](docs/ui-deferred.md)) |
 | Address + deploy record scripts | Treasury multisig, withdrawal caps |
+| Operator React UI (`ui/`) for consolidate / split / claim | |
 
 ## Epoch model
 
