@@ -136,14 +136,21 @@ and the chain are the only cross-operator surfaces.
 
 ---
 
-## Rendering notes
+## Source & rendering notes
 
-- **Mermaid** (text-in-repo) is the primary format: versionable, diffable, and
-  rendered natively by GitHub/GitLab/VS Code with zero tooling.
-- To export PNG/SVG/images for external docs or chat, render locally:
+- **Sources of truth:** the diagrams live as Mermaid text in this file
+  (`workflow-diagrams.md`, rendered natively by GitHub/GitLab/VS Code) and as
+  individual CLI sources in [`diagrams/`](diagrams/) —
+  `end-user-perspective.mmd`, `node-runner-perspective.mmd`,
+  `operator-perspective.mmd`. Keep both in sync when editing.
+- **Regenerate the PNGs:** run [`diagrams/render.sh`](diagrams/render.sh) (it
+  outputs crisp high-resolution PNGs — 3x scale, 2400px max dimension — the
+  mermaid-cli 800px default is too blurry for text).
+- To export anywhere else (external docs, chat):
 
   ```
-  npx -y @mermaid-js/mermaid-cli -i docs/workflow-diagrams.md -o out.png
+  npx -y @mermaid-js/mermaid-cli -i diagrams/end-user-perspective.mmd \
+      -o diagrams/end-user-perspective.png --size 2400 -s 3
   ```
 
 - Pair each diagram with a one-line "read:" note (above) so reviewers understand

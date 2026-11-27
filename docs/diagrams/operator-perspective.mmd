@@ -1,0 +1,16 @@
+flowchart TD
+    A["Provision a box: OS, Docker, storage"] --> B["Run BCH full node (BCHN) + enable ZMQ"]
+    B --> C["Deploy psf-slp-indexer-g2 (own chain feed)"]
+    C --> D["Deploy ipfs-file-pin-service (own Mongo, own wallet)"]
+    D --> E["Configure: PAYOUT_ADDRESS, SATS_PER_MB, payout wallet"]
+    E --> F["Connect to pin network (helia-coord)"]
+    F --> F1["BOOTSTRAP_SERVERS: find initial peers"]
+    F --> F2["ANNOUNCE_MULTIADDRS: advertise direct dial addr"]
+    F --> F3["wireguard/proxy: expose REST + libp2p addrs"]
+    F1 & F2 & F3 --> G["Indexer webhook → local pin-service (172.17.0.1:5031)"]
+    G --> H["Register in federation: SLP NFT identity + roster pubkey"]
+    H --> I["Operation loop: monitor pins, retries, peer health, DHT announce"]
+    I --> J["Monthly: sign attestations, receive score-weighted payout"]
+
+    style A fill:#f6eee2
+    style J fill:#e8ffe8

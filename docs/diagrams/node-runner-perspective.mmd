@@ -1,0 +1,20 @@
+flowchart TD
+    A["Run own full Cash Stack (full node + indexer + pin-service)"] --> B
+    subgraph DAILY ["Daily / continuous — doing the work"]
+        B["Index claims from own chain feed"]
+        B --> C["Validate BCH payments (payout address, size, 98% rule)"]
+        C --> D["Fetch content via mesh and pin it"]
+        D --> E["Serve content + announce on DHT"]
+    end
+    E --> F["Monthly: own SLP NFT identity = homing beacon"]
+    F --> G["Sign score attestations { month, score for each other node }"]
+    G --> H["Post attestations on-chain (public, non-repudiable)"]
+    H --> I["Aggregator: mean score per node (self excluded)"]
+    I --> J["Payout vector ∝ mean scores (largest-remainder, sats → treasury)"]
+    J --> K["Settlement tx: pool UTXOs → member P2PKH + treasury"]
+    K --> L["≥K member signatures over the exact tx"]
+    L --> M["Broadcast settlement (CLTV monthly window, outputs guarded)"]
+    M --> N["Receive BCH payout ∝ performance"]
+
+    style A fill:#eef6ff
+    style N fill:#e8ffe8

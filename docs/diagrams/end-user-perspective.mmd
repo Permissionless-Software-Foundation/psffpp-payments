@@ -1,0 +1,30 @@
+sequenceDiagram
+    autonumber
+    participant U as End-User / client
+    participant S as ipfs-file-stager
+    participant B as BCH chain (shared truth)
+    participant I as psf-slp-indexer-g2 (every node)
+    participant P as ipfs-file-pin-service (every node)
+    participant F as IPFS swarm / helia-coord mesh
+
+    U->>S: 1. POST /ipfs/upload (file)
+    S->>F: 2. add file to IPFS → compute CID
+    S-->>U: 3. CID
+    U->>S: 4. POST /ipfs/getBchCost {sizeInMb}
+    S->>P: 5. GET /ipfs/payment-address
+    P-->>S: 6. { payoutAddress, satsPerMb }
+    S-->>U: 7. quote { payoutAddress, satsRequired }
+    U->>B: 8. send BCH → payoutAddress
+    B-->>U: 9. paymentTxid
+    U->>S: 10. POST /ipfs/createPinClaim { cid, filename, paymentTxid }
+    S->>B: 11. verify payment really pays payoutAddress
+    S->>B: 12. broadcast OP_RETURN claim (psffpp.createPinClaimBCH)
+    B-->>S: 13. claimTxid
+    B->>I: 14. block/ZMQ: claim 00510000 detected
+    I->>P: 15. webhook POST /ipfs/pin-claim (fire-and-forget)
+    P->>B: 16. re-fetch + verify payment TX (fails closed: F1–F8)
+    P->>F: 17. download CID from any peer (direct dial)
+    P->>P: 18. validate real size vs satsPaid (98% tolerance)
+    P->>F: 19. pin + DHT provide
+    U->>P: 20. GET /ipfs/pin-status/:cid ⇒ dataPinned: true
+    F-->>U: 21. content served at /ipfs/view/:cid
