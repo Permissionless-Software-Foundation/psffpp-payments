@@ -78,7 +78,26 @@ CashTokens spec, and SolidCash's own repository:
 > *SLP records who earned what (tracking, auditing).*  
 > *Script enforces who can move the money (payment contracts).*
 
-### 3.1 Money flow
+### 3.1 Node topology (assumed)
+
+This design assumes the topology already deployed for the pin network: **one
+network node = one `psf-slp-indexer-g2` / block-indexer instance paired with one
+`ipfs-file-pin-service` instance**. Each pair:
+
+- runs its own chain feed (full-node ZMQ), so claim discovery needs no shared
+  indexer — every node detects the `00510000` pin-claim OP_RETURNs itself;
+- webhooks its own *local* pin-service (`PIN_API_URL` → `172.17.0.1:5031`,
+  Docker gateway → host), so there is **no central point of failure** in claim
+  delivery;
+- keeps its own Mongo, pin lifecycle, and `dataPinned` facts — redundancy (N
+  copies of each CID) is produced by N independent index → notify → validate →
+  pin chains, not by any quorum.
+
+Consequence for score attestations: this gives each member one clean,
+objectively measurable identity to attest about (claims indexed, files pinned,
+bytes served) — the natural unit for the SLP NFT roster below.
+
+### 3.2 Money flow
 
 - The per-pin pricing stays exactly as today (sats/MB quote from pin-service).
   The only change: the payout target becomes the **pool address (P2SH32)** instead
@@ -89,7 +108,7 @@ CashTokens spec, and SolidCash's own repository:
   roll into the next month's pool.
 - No per-payment bookkeeping, no token conversion, no burn.
 
-### 3.2 The reputation/roster layer (SLP)
+### 3.3 The reputation/roster layer (SLP)
 
 - Each member node owns an **SLP NFT identity** — its *homing beacon*. NFT
   mutable data carries pointers (endpoints, payout addresses, pubkeys) that
@@ -101,7 +120,7 @@ CashTokens spec, and SolidCash's own repository:
 - The **active set** for a month = the nodes with valid signed submissions that
   month. Roster churn (3→10 nodes) requires no contract change.
 
-### 3.3 The settlement contract (CashScript)
+### 3.4 The settlement contract (CashScript)
 
 The contract does **not** know the roster or compute averages. Its rules are
 deliberately minimal:
@@ -117,7 +136,7 @@ deliberately minimal:
    examples.)
 4. **Monthly window** — a CLTV/timelock gate prevents early settlement.
 
-### 3.4 Variable node count (3–10)
+### 3.5 Variable node count (3–10)
 
 - The contract is **roster-agnostic**: "10" is a network *policy* cap (biz-plan
   M12), never a contract constant.
@@ -131,7 +150,7 @@ deliberately minimal:
   to the new address. Uses the same payout-address hot-swap plumbing the
   pin-service/stager already has.
 
-### 3.5 Why the average is off-chain
+### 3.6 Why the average is off-chain
 
 - Score attestations must be public anyway for anyone to recompute trust.
 - Aggregation rules (exclude self, submission quorum, rounding fixed as
